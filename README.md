@@ -9,19 +9,18 @@ The minimum PaddlePaddle version needed for the code sample in this directory is
 
 可以表现为以下形式:   
 
-$$
-y_l = h(x_l) + f(x_l, w_l)
-x_{l+1} = f(y_l)
-$$
+<img src="https://latex.codecogs.com/gif.latex?$$&space;y_l&space;=&space;h(x_l)&space;&plus;&space;f(x_l,&space;w_l)&space;$$" title="$$ y_l = h(x_l) + f(x_l, w_l) $$" />
+<img src="https://latex.codecogs.com/gif.latex?x_{l&plus;1}&space;=&space;f(y_l)" title="x_{l+1} = f(y_l)" />
 
-其中$h(x_1)$为一个恒等映射，$f(y_l)$代表ReLU激活函数，在[2]中提出了，如果如果$h(x)$和$f(y)$都是恒等映射，即$h(x_l)=x_l、f(y_l)=y_l$，那么在训练的前向和反向传播阶段，信号可以直接从一个单元传递到另外一个单元，使得训练变得更加简单。 
+其中$h(x_1)$为一个恒等映射，$f(y_l)$代表ReLU激活函数，在[2]中提出了，如果如果$h(x)$和$f(y)$都是恒等映射，即<img src="https://latex.codecogs.com/gif.latex?$h(x_l)=x_l、f(y_l)=y_l$" title="$h(x_l)=x_l、f(y_l)=y_l$" />，那么在训练的前向和反向传播阶段，信号可以直接从一个单元传递到另外一个单元，使得训练变得更加简单。 
+
 在DNN16中，具有以下优良特性：
 
-（1）对于任意深的单元**L**的特征 $x_L$ 可以表达为浅层单元**l**的特征 $x_l$加上一个形如 $\sum_{i=l}^{L−1}F$的残差函数，这表明了任意单元**L** 和 **l**之间都具有残差特性。 
+（1）对于任意深的单元**L**的特征 $x_L$ 可以表达为浅层单元**l**的特征<img src="https://latex.codecogs.com/gif.latex?$x_l$" title="$x_l$" />加上一个形如 <img src="https://latex.codecogs.com/gif.latex?$\sum_{i=l}^{L−1}F$" title="$\sum_{i=l}^{L−1}F$" />的残差函数，这表明了任意单元**L** 和 **l**之间都具有残差特性。 
 
-（2）对于任意深的单元 **L**，它的特征 $x_L = x_0 + \sum_{i=0}^{L−1}F(x_i,W_i)$，即为之前所有残差函数输出的总和(加上$x_0$)。而正好相反的是，“plain network”中的特征xL是一系列矩阵向量的乘积，也就是$\prod_{i=0}^{L−1}W_i x_0$，而求和的计算量远远小于求积的计算量。
+（2）对于任意深的单元 **L**，它的特征 <img src="https://latex.codecogs.com/gif.latex?$x_L&space;=&space;x_0&space;&plus;&space;\sum_{i=0}^{L−1}F(x_i,W_i)$" title="$x_L = x_0 + \sum_{i=0}^{L−1}F(x_i,W_i)$" />，即为之前所有残差函数输出的总和(加上<img src="https://latex.codecogs.com/gif.latex?$x_0$" title="$x_0$" />)。而正好相反的是，“plain network”中的特征<img src="https://latex.codecogs.com/gif.latex?$x_L$" title="$x_L$" />是一系列矩阵向量的乘积，也就是<img src="https://latex.codecogs.com/gif.latex?$\prod_{i=0}^{L−1}W_i&space;x_0$" title="$\prod_{i=0}^{L−1}W_i x_0$" />，而求和的计算量远远小于求积的计算量。
 
-实验发现，$h(x_l) = x_l$的误差衰减最快，误差也最低(下图a子图所示)：  
+实验发现，<img src="https://latex.codecogs.com/gif.latex?$h(x_l)&space;=&space;x_l$" title="$h(x_l) = x_l$" />的误差衰减最快，误差也最低(下图a子图所示)：  
 
 ![pic2](./img/pic2.png)
 
@@ -91,13 +90,13 @@ image = paddle.layer.data(name="image", type=paddle.data_type.dense_vector(DATA_
 
 lbl = paddle.layer.data(name="label", type=paddle.data_type.integer_value(CLASS_DIM))
 
-（省略部分代码）
+# 省略部分代码
 
 trainer = paddle.trainer.SGD(cost=cost,
                              parameters=parameters,
                              update_equation=optimizer,
                              extra_layers=extra_layers)
-（省略部分代码）
+# 省略部分代码
    
 trainer.train(
         reader=train_reader, num_passes=200, event_handler=event_handler)
@@ -123,7 +122,7 @@ Pass 0, Batch 1, Cost 2.1532, ...
 同时在```train.py```目录下，每趟训练完成时，将生成```params_pass_0.tar,gz```，最后一趟的200.tar.gz文件生成时，训练完成。
 
 ### 应用模型
-应用训练好的模型，执行``` python infer.py -data_list <文件目录> =model drn```即可：
+应用训练好的模型，执行``` python infer.py -data_list <文件目录> -model drn```即可：
 ```
 # load parameters
 with gzip.open('params_pass_200.tar.gz', 'r') as f:
@@ -140,3 +139,9 @@ for file_name, result in zip(file_list, lab):
     print "Label of %s is: %d" % (file_name, result[0])
 ```
 代码将从图片文件夹中读取对应的图片文件，同时给出预测的标签结果，并进行输出。
+
+### 参考文献
+
+[1] [Deep Residual Learning for Image Recognition](http://arxiv.org/pdf/1512.03385.pdf)
+
+[2] [Identity Mappings in Deep Residual Networks](https://arxiv.org/abs/1603.05027)
