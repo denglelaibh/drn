@@ -48,6 +48,10 @@ The minimum PaddlePaddle version needed for the code sample in this directory is
     <td> drn.py </td>
     <td> 定义DRN的网络结构 </td>
   </tr>
+    <tr>
+    <td> utils.py </td>
+    <td> 测验并显示训练过程 </td>
+  </tr>
 </table>
 
 ## 基于flower数据集的模型复现
@@ -120,6 +124,17 @@ Pass 0, Batch 1, Cost 2.1532, ...
 ```
 
 同时在```train.py```目录下，每趟训练完成时，将生成```params_pass_0.tar,gz```，最后一趟的200.tar.gz文件生成时，训练完成。
+### 简化测验
+应用```python utils.py```可以简化训练过程的输出，观察训练的cost和效果的变化
+```
+[INFO 2018-03-27 09:21:50,020 utils.py:83] pass_id:0,batch_id:0,train_cost:2.97480511665,s:{'classification_error_evaluator': 0.875}
+INFO    :pass_id:0,batch_id:0,train_cost:2.97480511665,s:{'classification_error_evaluator': 0.875}
+[INFO 2018-03-27 09:21:55,806 utils.py:83] pass_id:0,batch_id:10,train_cost:4.01303768158,s:{'classification_error_evaluator': 1.0}
+INFO    :pass_id:0,batch_id:10,train_cost:4.01303768158,s:{'classification_error_evaluator': 1.0}
+[INFO 2018-03-27 09:22:01,413 utils.py:83] pass_id:0,batch_id:20,train_cost:2.66417765617,s:{'classification_error_evaluator': 0.875}
+INFO    :pass_id:0,batch_id:20,train_cost:2.66417765617,s:{'classification_error_evaluator': 0.875}
+
+```
 
 ### 应用模型
 应用训练好的模型，执行``` python infer.py -data_list <文件目录> -model drn```即可：
