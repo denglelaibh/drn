@@ -5,6 +5,8 @@ import numpy as np
 from PIL import Image
 
 import paddle.v2 as paddle
+import reader
+import vgg
 import drn
 
 
@@ -35,8 +37,9 @@ def main():
     image = paddle.layer.data(
         name="image", type=paddle.data_type.dense_vector(DATA_DIM))
 
-    if args.model == 'drn':
-        out = drn.drn16(image, class_dim=CLASS_DIM)
+    if  args.model == 'drn':
+        out = drn.drn_imagenet(image, class_dim=CLASS_DIM)
+  
 
     # load parameters
     with gzip.open(args.params_path, 'r') as f:

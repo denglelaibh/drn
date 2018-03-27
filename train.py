@@ -3,9 +3,10 @@ import argparse
 
 import paddle.v2.dataset.flowers as flowers
 import paddle.v2 as paddle
+import reader
 import drn
 
-DATA_DIM = 3 * 224 * 224
+DATA_DIM = 3 * 224 * 224  
 CLASS_DIM = 102
 BATCH_SIZE = 128
 
@@ -17,12 +18,12 @@ def main():
         'model',
         help='The model for image classification',
         choices=[
-           'drn'
+            'drn'
         ])
     args = parser.parse_args()
 
     # PaddlePaddle init
-    paddle.init(use_gpu=True, trainer_count=1)
+    paddle.init(use_gpu=False, trainer_count=1)
 
     image = paddle.layer.data(
         name="image", type=paddle.data_type.dense_vector(DATA_DIM))
@@ -31,8 +32,10 @@ def main():
 
     extra_layers = None
     learning_rate = 0.01
-    if args.model == 'drn':
-        out = drn.drn16(image, class_dim=CLASS_DIM)
+    if  args.model == 'drn':
+        out = drn.drn_imagenet(image, class_dim=CLASS_DIM)
+        learning_rate = 0.1
+
 
     cost = paddle.layer.classification_cost(input=out, label=lbl)
 

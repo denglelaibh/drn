@@ -1,6 +1,7 @@
 import paddle.v2 as paddle
 
-__all__ = ['drn16']
+__all__ = ['drn_imagenet']
+
 
 def conv_bn_layer(input,
                   ch_out,
@@ -54,17 +55,25 @@ def layer_warp(block_func, input, ch_out, count, stride):
     return conv
 
 
-def drn16(input, class_dim, depth=32):
-    assert (depth - 2) % 6 == 0
-    n = (depth - 2) / 6
+def drn_imagenet(input, class_dim, depth=50):
+    cfg = {
+        18: ([2, 2, 2, 1], basicblock),
+        34: ([3, 4, 6, 3], basicblock),
+        50: ([3, 4, 6, 3], bottleneck),
+        101: ([3, 4, 23, 3], bottleneck),
+        152: ([3, 8, 36, 3], bottleneck)
+    }
+    stages, block_func = cfg[depth]
     conv1 = conv_bn_layer(
-        input, ch_in=3, ch_out=16, filter_size=3, stride=1, padding=1)
-    res1 = layer_warp(basicblock, conv1, 16, n, 1)
-    res2 = layer_warp(basicblock, res1, 32, n, 2)
-    res3 = layer_warp(basicblock, res2, 64, n, 2)
-    pool = paddle.layer.img_pool(
-        input=res3, pool_size=8, stride=1, pool_type=paddle.pooling.Avg())
-    out = paddle.layer.fc(input=pool,
+        input, ch_in=3, ch_out=64, filter_size=7, stride=2, padding=3)
+    pool1 = paddle.layer.img_pool(input=conv1, pool_size=3, stride=2)
+    res1 = layer_warp(block_func, pool1, 64, stages[0], 1)
+    res2 = layer_warp(block_func, res1, 128, stages[1], 2)
+    res3 = layer_warp(block_func, res2, 256, stages[2], 2)
+    res4 = layer_warp(block_func, res3, 512, stages[3], 2)
+    pool2 = paddle.layer.img_pool(
+        input=res4, pool_size=7, stride=1, pool_type=paddle.pooling.Avg())
+    out = paddle.layer.fc(input=pool2,
                           size=class_dim,
                           act=paddle.activation.Softmax())
     return out
